@@ -1,0 +1,50 @@
+2/23/2021
+
+get all possible moves for that piece (*probability for 1-4) -- expand out tree
+do for all pieces
+
+- turn states/moves(??) into nodes in tree
+- recursively call to it for x amount of turns (depth of tree)
+- apply expectiminimax algorithm to find best turn given probability
+
+ID's
+p1 squares = 0,1,2,3,4,5
+middle = 6,7,8,9,10,11,12,13
+p2 squares = 14,15,16,17,18,19
+
+*****
+- working on movePiece so that if "spot" is equal to -1 then the piece will return to "home" spot
+
+- $("#p"+piece.id).appendTo(document.getElementsByTagName("div")[0]); sends piece back to home row, not exact location though.
+
+- for Piece class, change "color" to team?
+
+
+state array is an array of all the board spaces, a space being a div element
+
+3/3/21
+- make game board fully functional -- pieces go to correct spots on correct sides of board
+- add gameOver global variable -- check if either player has successfully moved all pieces off the board and won
+- add pieceSafe (0-1) parameter for neural network? -- ex: if there is an enemy piece 2 spaces behind our piece
+  in the "danger" zone, value: .5?
+
+
+
+3/8/21
+
+pseudo code for hover method
+
+mouseHover(n, bool){
+  if(checkLocation(hoverLocation, team)){    ///gives us a true or false if piece can move
+
+  }
+
+}
+*old*
+ERROR found:
+pieces in middle call getSpace at line 460 with (piece.location && piece.team)
+in middle row team == 3 and getSpace is failing to get the space I believe
+
+4/9/21
+-- fix getMoves() to properly work when AI is trying to move to scoring piece (14)
+@will -- settings page could maybe have a mute audio option, play vs. CPU or player, etc.

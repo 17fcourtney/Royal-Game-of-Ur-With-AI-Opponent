@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Royal Game of Ur</title>
+
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=MedievalSharp" />
+    <link rel="stylesheet" href="index_style.css">
+    <script src="jquery-3.5.1.min.js"></script>
+</head> 
+
+<body>
+    <div id="title"><h1>HOW TO PLAY</h1></div>
+    <div id="how-to-play-div">
+        <h3>START</h3>
+        <div>
+            The game is played in turns. Each turn, a player rolls four dice shaped as triangular pyramids.
+            <br>
+            <br>
+            For each painted point facing up of a dice rolled, adds to how many spaces are given to move whichever piece they like.
+            <br>
+            <br>
+            The player then chooses which piece to move.
+        </div> 
+        <h3>MOVEMENT</h3>
+        <div>
+            The player can only move to a space if...
+            <ul>
+                <li>A space is not occupied</li>
+                <li>A space is occupied by an opponent and is not a rossette</li>
+            </ul>
+        
+            If the piece is moved to a rossette space, the player gets another roll.
+            <br>
+            <br>
+            When a player moves to a space that is occupied by the opponent, the opponent's piece is then moved back to the starting position. 
+            <br>
+            <br>
+            If a player can not move, or the player rolled a 0, their turn is over.
+            <br>
+            <br>
+            The direction in which the pieces move can be seen below
+            <br>
+            <br>
+            <img src="boardDirection.png" alt="">
+        </div>
+        <h3>WINNING</h3>
+        <div>Once a players has all 5 pieces off the board, they win.</div>
+    </div>
+    <a href="index.html"><div id="backToMenu">X</div></a>
+</body>
+</html>
