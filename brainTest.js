@@ -356,8 +356,8 @@ trainData = [
 },
 ];
 
-// let out = net.train(trainData,config);
-// console.log(out);
+ //let out = net.train(trainData,config);
+ //console.log(out);
 
 function run(input) {
   return (net.run(input));

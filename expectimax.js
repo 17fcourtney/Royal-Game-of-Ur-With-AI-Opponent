@@ -19,7 +19,7 @@ class Space {
     removePiece(){
         this.occupied = false;
         this.occupiedByPiece = undefined;
-        console.log("ran");
+        console.log("ran Space.removePiece()");
     }
 }
 
@@ -37,9 +37,9 @@ class Piece {
 //** true/false and piece occupying space respectively */
 //
 function updateOccupied(board, pieces) {
-    var retVal = board;
-    for (var x = 0; x < pieces.length; x++) {
-        for (var i = 0; i < retVal.length;i++) {
+    let retVal = board;
+    for (let x = 0; x < pieces.length; x++) {
+        for (let i = 0; i < retVal.length;i++) {
             if (pieces[x].location == retVal[i].spot) { 
                 retVal[i].occupied = true;
                 retVal[i].occupiedByPiece = pieces[x];
@@ -111,20 +111,28 @@ function canRemoveEnemy(position, team) {
     if (ROLL == 0) {
         return retVal;
     }
-    let space = getSpace(position, team);
-    let removalPiece = space.occupiedByPiece; // enemy piece that is on space and attempting to be removed.
     
-    
-    if (position <= 3 || position >= 12 || position == 7) {
-        return retVal;
-    } else {
-        if (space.rosette == true && position == 7) {
-            console.log('x');
-            retVal = false;
+        let space = getSpace(position, team);
+        //debug info *start
+        if (space.occupied == true && space.rosette == false) {
+            let removalPiece = space.occupiedByPiece; // enemy piece that is on space and attempting to be removed.
+            console.log('---possible removal piece ID: '+removalPiece.id);
+            console.log('---possible removal piece location: '+removalPiece.location);
         }
-    } if (space.occupied == true && space.occupiedByPiece.team != 1 && space.team == 3) {
-        retVal = true;
-    } 
+        //debug info *end
+
+        if (position <= 3 || position >= 12 || position == 7) {
+            return retVal;
+        } else {
+            if (space.rosette == true && position == 7) {
+                //console.log('x');
+                retVal = false;
+            }
+        } if (space.occupied == true && space.occupiedByPiece.team != 1 && space.team == 3) {
+            retVal = true;
+            
+        } 
+    
     return retVal;
 }
 
@@ -226,6 +234,9 @@ function aiPlay(team) {
     let t = -1;
     if (turn == 1) { 
         let m = getMoves(ROLL);
+        if (m == null || m == undefined) {
+            return;
+        }
         console.log(m);
         for (let i = 0; i < m.length; i++) {
             let move = {
@@ -284,7 +295,9 @@ function changeTurn(){
 
 // n is the piece number in the player array 
 function gameRun(team, n){
+    console.log('---BOARD STATE---');
     console.log(board);
+    console.log('-----------------');
     $(document).ready(async function() {
         if (turn == 1 && ROLL != 0){ 
             team = 1;
@@ -296,7 +309,7 @@ function gameRun(team, n){
             if (checkHoverLocation(location,team)){ 
                 movePiece(team,p1Pieces[n],location); 
                 
-                if (!getSpace(location, team).rosette){         //this will run if the piece does not land on a rosette
+                if (location === 14 || (!getSpace(location, team).rosette)){         //this will run if the piece does not land on a rosette
                     disablesPieces();
                     $(".turnDisplay").html("Player 2's turn");
                     //changeTurn();
@@ -306,8 +319,12 @@ function gameRun(team, n){
                     disablesPieces();
                     $(".turnDisplay").html("Player 1, roll again");
                     updateOccupied(board,totalPieces);
+                    console.log('before roll');
+                    console.log(ROLL);
                     roll();
-                    
+                    if (ROLL === 0) {
+                        return;
+                    }
                     let b = aiPlay(1);
                     gameRun(b.team,b.piece.id);
                 }
@@ -326,19 +343,20 @@ function gameRun(team, n){
             if(checkHoverLocation(location,2)){
                 movePiece(team,p2Pieces[n],location);
                 
-                if(!getSpace(location, team).rosette){         //this will run if the piece does not land on a rosette
+                if(location === 14 || (!getSpace(location, team).rosette)){         //this will run if the piece does not land on a rosette
                     disablesPieces();
                     $(".turnDisplay").html("Player 1's turn"); 
                     //changeTurn();
                     turn = 1;
                     roll();
-                    // if (turn == 1 && ROLL == 0) {
-                    //     changeTurn();
-                    //     return;
-                    // }
+                    if (ROLL === 0) {
+                        console.log('debug spot');
+                        return;
+                    }
+                    
                     console.log(aiPlay(1));
                     let b = aiPlay(1);
-                    console.log(b);
+                    
                     gameRun(b.team,b.piece.id);
                 }
                 else {
@@ -355,7 +373,7 @@ function gameRun(team, n){
 
 //checks if mouse is hovering on a piece n, bool variable is set to false when the mouse is no longer hovering. 
 function mouseHover(n, bool){
-    let button = document.getElementById("p"+n);
+    //let button = document.getElementById("p"+n);
     let index = n;
     let hoverLocation = -1;
     let teamClass;
@@ -488,8 +506,12 @@ function movePiece(team,piece,location) {
             $("#p"+piece.id).appendTo(document.getElementsByTagName("div")[0]); //move back to starting position
         });
     } else if (location == 14) {
+        oldSpace = getSpace(piece.location, piece.team);
+        //oldSpace = getSpace(piece.location, turn);
+        console.log(piece.team);
+        console.log(oldSpace);
         playerScored(piece.team,piece);
-        oldSpace = getSpace(piece.location, piece.team); 
+        //oldSpace = getSpace(piece.location, piece.team); 
         oldSpace.removePiece();
     }
     updateOccupied(board,totalPieces);
@@ -534,7 +556,7 @@ function getMoves(roll) {
     if (roll == 0) {
         return null;
     }
-    for (var x = 0; x < p1Pieces.length; x++) {
+    for (let x = 0; x < p1Pieces.length; x++) {
         let newSpace = roll+p1Pieces[x].location;
         let team;
         if (newSpace > 14) 
@@ -672,6 +694,9 @@ function roll(){
         turn = 1;
         console.log(turn);
         roll();
+        if (ROLL === 0) {
+            return ROLL;
+        }
         let b = aiPlay(1);
         gameRun(b.team,b.piece.id);
     }
@@ -736,33 +761,6 @@ board = updateOccupied(board,totalPieces);
 
 console.log(board);
 
-// for (let x = 0; x < 30; x ++) {
-//     let pos = Math.floor(Math.random() * 9);
-//     let rolls = Math.floor(Math.random() * 5);
-//     let k = pos+rolls;
-//     let team = 1;
-//     if (k > 3 && k < 12) {
-//         team = 3;
-//     } else {
-//         team = 1;
-//     }
-//     //console.log(team);
-//     //console.log(pos);
-    
-//     let ros = getSpace(k,team);
-//     ros = ros.rosette;
-//     trainData.push({
-//         input: {
-//           position: pos,
-//           roll: rolls,
-//           rosette: ros,
-//           removeEnemyPiece: canRemoveEnemy(pos+rolls,team)
-//         },
-//         output: {
-//           result: evaluateBoard(pos,rolls,team) 
-//         } 
-//       })
-// }
 
 // let out = net.train(trainData,config);
 // var jsonData = net.toJSON();
