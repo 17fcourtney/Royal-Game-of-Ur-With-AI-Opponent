@@ -95,8 +95,9 @@ body{
 
 #tempPlayer2Turn{
   bottom: 25px;
-  box-shadow: inset 0px 0px 10px 10px rgba(0,0,0,0.6);
-  opacity: 20%;
+  background-color: rgb(153, 134, 81);
+  box-shadow:  0px 0px 10px 10px rgba(0,0,0,0.6);
+  /*opacity: 20%; */
 }
 
 #player1Out{
@@ -120,13 +121,14 @@ body{
   background-color: rgb(153, 134, 81);
   box-shadow: 0px 0px 10px 10px rgba(0,0,0,0.6);
   animation: animateOut 1s;
+  /*opacity: 20%;*/
 }
 
 #player2In{
   bottom: 25px;
   box-shadow: inset 0px 0px 10px 10px rgba(0,0,0,0.6);
   animation: animateIn 1s;
-  opacity: 20%;
+  /*opacity: 20%;*/
 }
 
 @keyframes animateOut {
