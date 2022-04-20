@@ -55,11 +55,11 @@ function updateOccupied(board, pieces) {
 //** initial starting state for the board **/
 function setInitialState() {
     ids = document.querySelectorAll('[id]');
-    var arr = [];
+    let arr = [];
     
-    for (var i = 0; i < ids.length; i++) {
-        var temp = ids[i];
-        var tempTeam;
+    for (let i = 0; i < ids.length; i++) {
+        let temp = ids[i];
+        let tempTeam;
         if (temp.className.includes("team1")){
             tempTeam = 1
         }
@@ -84,10 +84,10 @@ function setInitialState() {
 
 function getButtons() {
     ids = document.querySelectorAll("button");
-    var arr = [];
+    let arr = [];
     
-    for (var i = 0; i < ids.length; i++) {
-        var temp = ids[i];
+    for (let i = 0; i < ids.length; i++) {
+        let temp = ids[i];
         if (temp.classList.contains("black")) {
             temp = new Piece(-1,2,i, false);       //piece(location, team, id)
             arr.push(temp);
@@ -275,20 +275,16 @@ function sleep(ms) {
 
 function changeTurn(){
     $(document).ready(function() {
-        if(turn==1){
-            $(".turnDisplay1").attr("id", "player1In");
-            $(".turnDisplay1").html("");
-            $(".turnDisplay2").attr("id", "player2Out");
-            $(".turnDisplay2").html("Player 2, Roll");
-            turn=2;
-            
-        }
-        else{
+        if(turn == 1){
             $(".turnDisplay1").attr("id", "player1Out");
-            $(".turnDisplay1").html("Player 1, Roll");
-            $(".turnDisplay2").attr("id", "player2In");
-            $(".turnDisplay2").html("");
-            turn=1;
+            //$(".turnDisplay1").html("");
+            $(".turnDisplay2").attr("id", "player2Out");
+            //$(".turnDisplay2").html("Player 2, Roll");
+        }
+        else {
+            $(".turnDisplay1").attr("id", "player1In");
+            $(".turnDisplay2").attr("id", "player2Out");
+            //$(".turnDisplay2").html("Player 2, Roll");
         }
     });
 }
@@ -298,6 +294,7 @@ function gameRun(team, n){
     console.log('---BOARD STATE---');
     console.log(board);
     console.log('-----------------');
+    changeTurn();
     $(document).ready(async function() {
         if (turn == 1 && ROLL != 0){ 
             team = 1;
@@ -311,9 +308,10 @@ function gameRun(team, n){
                 
                 if (location === 14 || (!getSpace(location, team).rosette)){         //this will run if the piece does not land on a rosette
                     disablesPieces();
-                    $(".turnDisplay").html("Player 2's turn");
-                    //changeTurn();
+                    //$(".turnDisplay2").html("Player 2's turn");
                     turn = 2;
+                    changeTurn();
+                    
                 }
                 else {
                     disablesPieces();
@@ -345,23 +343,21 @@ function gameRun(team, n){
                 
                 if(location === 14 || (!getSpace(location, team).rosette)){         //this will run if the piece does not land on a rosette
                     disablesPieces();
-                    $(".turnDisplay").html("Player 1's turn"); 
-                    //changeTurn();
+                    $(".turnDisplay1").html("Player 1's turn"); 
                     turn = 1;
+                    changeTurn();
                     roll();
                     if (ROLL === 0) {
                         console.log('debug spot');
                         return;
                     }
-                    
                     console.log(aiPlay(1));
                     let b = aiPlay(1);
-                    
                     gameRun(b.team,b.piece.id);
                 }
                 else {
                     disablesPieces();
-                    $(".turnDisplay").html("Player 2, roll again");
+                    $(".turnDisplay2").html("Player 2, roll again");
                 }
             }
             else
@@ -448,7 +444,7 @@ function playerPiecesOnBoard(player){
  */
 function moveOffBoard(piece){
     $(document).ready(function() {
-        let player;
+        //let player; not used right now
         let yLevel;     //this will change the "top" or "bottom" of the piece depending on the team
         let left;
         if(piece.team==1){
@@ -519,10 +515,10 @@ function movePiece(team,piece,location) {
 
 
 function displayButton(){
-    for(var x=0; x<5; x++){       
-        var left = x*50
+    for(let x=0; x<5; x++){       
+        let left = x*50
         // 1. Create the button
-        var button = document.createElement("button");
+        let button = document.createElement("button");
         button.setAttribute("class", "white");
         button.setAttribute("onclick", "gameRun(1," + x + ")");
         button.setAttribute("id", "p" + x);
@@ -533,10 +529,10 @@ function displayButton(){
         button.disabled= true;
         document.getElementsByTagName("div")[0].appendChild(button);    
     }
-    for(var x=0; x<5; x++){      
-        var left = x*50;
+    for(let x=0; x<5; x++){      
+        let left = x*50;
         // 1. Create the button
-        var button = document.createElement("button");
+        let button = document.createElement("button");
         button.setAttribute("class", "black");
         button.setAttribute("onclick", "gameRun(2," + x + ")");
         button.setAttribute("id", "p"+(x+5));
@@ -674,7 +670,7 @@ function sleep (time) {
 function roll(){
     sum = 0
     dieList = [0,0,1,1]
-    for(var x = 0; x < 4; x++){
+    for(let x = 0; x < 4; x++){
         die = dieList[Math.floor(Math.random()*4)]      //picks a random number between 0-3 to get randomized dice
         sum += die
     }
@@ -683,10 +679,12 @@ function roll(){
     hasRolled=true;
     console.log("roll: " + ROLL);
     $(document).ready(function() {
-        if(turn==1)
+        if(turn==1) {
             $(".turnDisplay1").html("Player " + turn + " rolled a: " + ROLL);
-        else
+        } else {
             $(".turnDisplay2").html("Player " + turn + " rolled a: " + ROLL);
+        }
+
     });
     dice_roll.play();
     if (turn == 2 && ROLL == 0) {
@@ -707,7 +705,11 @@ function roll(){
     
     return ROLL;
 }
-
+/**
+ * 
+ * @param {*} team - the team that is scoring (1 or 2)
+ * @param {*} piece  - the player's piece that has scored 
+ */
 function playerScored(team,piece) {
     if (team == 1) {
         p1Score += 1;
