@@ -19,7 +19,6 @@ class Space {
     removePiece(){
         this.occupied = false;
         this.occupiedByPiece = undefined;
-        console.log("ran Space.removePiece()");
     }
 }
 
@@ -31,7 +30,6 @@ class Piece {
         this.onBoard = onBoard;
     }
 }
-
 
 /**
  * Used to update board array with new state of occupied spaces
@@ -287,23 +285,10 @@ function aiPlay(team) {
                 temp = p1Pieces[t];
             }
         }
-    /*
-    let abc = {maxMove,
-                output: {
-            result: evaluateBoard(maxMove.position, maxMove.roll, getTeamByPosition((maxMove.position+maxMove.roll),1))
-            }
-        };
-        console.log(abc);
-    */
+    
     maxMove.piece = temp;
     maxMove.team = getTeamByPosition(maxMove.position+maxMove.roll,1);
-    /*
-    if (maxMove.position+maxMove.roll > 3 && maxMove.position+maxMove.roll < 12) {
-        maxMove.team = 3;
-    } else {
-        maxMove.team = 1;
-    }
-    */
+    
     return maxMove;
     }
 }
@@ -432,13 +417,8 @@ function mouseHover(n, bool){
             index = n-5;
             hoverLocation = ROLL + p2Pieces[index].location;
         }
+        teamClass = getTeamByPosition(hoverLocation,turn);
         
-        if(hoverLocation>3 && hoverLocation<12)
-            teamClass=3
-        else if(turn==1)
-            teamClass=1;
-        else 
-            teamClass=2;
         if(bool){
             if(checkHoverLocation(hoverLocation, teamClass))
                 $("#" + hoverLocation + ".team" + teamClass).css("background-color", "green");
@@ -458,10 +438,7 @@ function mouseHover(n, bool){
  */
 function checkHoverLocation(hoverLocation, team){
     let retVal = false;
-    let spacesTeam = team;
-    if (hoverLocation > 3 && hoverLocation < 12) {
-        spacesTeam = 3;
-    }
+    let spacesTeam = getTeamByPosition(hoverLocation,team);
     let space = getSpace(hoverLocation,spacesTeam);
     if(hoverLocation > 14)
         retVal = false;
@@ -469,10 +446,9 @@ function checkHoverLocation(hoverLocation, team){
         retVal = true;
     else {
         if(space.occupied){
-            if(space.occupiedByPiece.team == team) {
+            if(space.occupiedByPiece.team == turn) {
                 retVal = false;
             }
-                
             else if(space.rosette)
                 retVal= false;
             else 
@@ -531,7 +507,7 @@ function moveOffBoard(piece){
 * @param location The location that the piece is being moved to (-1 - 14).
 */
 function movePiece(team,piece,location) {
-    let oldSpace;   
+    let oldSpace, test;   
     let newSpace = getSpace(location, team);
     if (location != -1 && location != 14) {
         //moves the button on the gui
@@ -543,12 +519,8 @@ function movePiece(team,piece,location) {
         });
         //if pieces current location is start position, then let team be passed as their respective team
         if(piece.location != -1){
-            let test;
-            if (piece.location > 3 && piece.location < 12) { //if piece is currently in danger zone, let team be passed as 3
-                test = 3;
-            } else {
-                test = piece.team;
-            }
+            test = getTeamByPosition(piece.location,piece.team);
+            
             oldSpace = getSpace(piece.location, test); 
             oldSpace.removePiece();
         }
@@ -559,12 +531,9 @@ function movePiece(team,piece,location) {
             $("#p"+piece.id).appendTo(document.getElementsByTagName("div")[0]); //move back to starting position
         });
     } else if (location == 14) {
-        oldSpace = getSpace(piece.location, piece.team);
-        //oldSpace = getSpace(piece.location, turn);
-        console.log(piece.team);
-        console.log(oldSpace);
+        test = getTeamByPosition(piece.location,turn);
+        oldSpace = getSpace(piece.location, test);
         playerScored(piece.team,piece);
-        //oldSpace = getSpace(piece.location, piece.team); 
         oldSpace.removePiece();
     }
     updateOccupied(board,totalPieces);
@@ -756,7 +725,7 @@ $('.speaker').click(function(e) {
   });
 /**
  * sets global ROLL variable
- * @returns randomly chosen number between 1 and 4 to represent the random dice roll
+ * @returns randomly chosen number between 0 and 4 to represent the random dice roll
  */
 function roll(){
     sum = 0
