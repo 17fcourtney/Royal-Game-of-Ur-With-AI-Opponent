@@ -338,8 +338,8 @@ function gameRun(team, n){
             await sleep(333);
             
             let location = p1Pieces[n].location + ROLL;
-            if(location > 3 && location < 12)
-                team = 3;
+            team = getTeamByPosition(location,1);
+            
             if (checkHoverLocation(location,team)){ 
                 movePiece(team,p1Pieces[n],location); 
                 
@@ -352,6 +352,7 @@ function gameRun(team, n){
                     disablesPieces();
                     $(".turnDisplay").html("Player 1, roll again");
                     updateOccupied(board,totalPieces);
+                    await sleep(333); //wait for a little time to show AI player actually moving pieces twice.
                     roll();
                     if (ROLL === 0) {
                         return;
@@ -369,8 +370,8 @@ function gameRun(team, n){
             team = 2;
             await sleep(333);
             let location = p2Pieces[n].location + ROLL;
-            if(location > 3 && location < 12)
-                team = 3;
+            team = getTeamByPosition(location,2);
+            
             if(checkHoverLocation(location,2)){
                 movePiece(team,p2Pieces[n],location);
                 
@@ -420,19 +421,27 @@ function mouseHover(n, bool){
         teamClass = getTeamByPosition(hoverLocation,turn);
         
         if(bool){
-            if(checkHoverLocation(hoverLocation, teamClass))
+            if(checkHoverLocation(hoverLocation, teamClass)) {
+                if (hoverLocation === 14 && turn == 2) { //if the human player is hovering a piece that will score, show them a message
+                    $("#player2CanScore").html("Scoring Move!");
+                }
                 $("#" + hoverLocation + ".team" + teamClass).css("background-color", "green");
-            else
+            }
+            else {
                 $("#" + hoverLocation + ".team" + teamClass).css("background-color", "red");
+            }
         }  
-        else 
-           $("#" + hoverLocation + ".team" + teamClass).css("background-color", "rgb(153, 134, 81)");
+        else {
+            $("#" + hoverLocation + ".team" + teamClass).css("background-color", "rgb(153, 134, 81)");
+            $("#player2CanScore").html("");
+        }
+           
     })
 }
 
 /**
  * checks to see if the location being hovered can be moved to or not
- * @param {*} hoverLocation space trying to be moved to
+ * @param {*} hoverLocation space trying to be moved to i.e. piece position + roll
  * @param {*} team 
  * @returns true if hoverLocation can be moved to
  */
@@ -531,6 +540,7 @@ function movePiece(team,piece,location) {
             $("#p"+piece.id).appendTo(document.getElementsByTagName("div")[0]); //move back to starting position
         });
     } else if (location == 14) {
+        $("#player2CanScore").html("");
         test = getTeamByPosition(piece.location,turn);
         oldSpace = getSpace(piece.location, test);
         playerScored(piece.team,piece);
@@ -543,7 +553,6 @@ function movePiece(team,piece,location) {
 function displayButton(){
     for(let x=0; x<5; x++){       
         let left = x*50
-        // 1. Create the button
         let button = document.createElement("button");
         button.setAttribute("class", "white");
         button.setAttribute("onclick", "gameRun(1," + x + ")");
@@ -557,7 +566,6 @@ function displayButton(){
     }
     for(let x=0; x<5; x++){      
         let left = x*50;
-        // 1. Create the button
         let button = document.createElement("button");
         button.setAttribute("class", "black");
         button.setAttribute("onclick", "gameRun(2," + x + ")");
@@ -748,6 +756,7 @@ function roll(){
     playDiceAudio();
 
     if (turn == 2 && ROLL == 0) {
+        $(".turnDisplay2").html("Player " + turn + " rolled a: " + ROLL);
         console.log(turn);
         turn = 1;
         console.log(turn);
