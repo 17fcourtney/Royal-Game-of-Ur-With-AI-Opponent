@@ -37,31 +37,66 @@ body{
 }
 
 #backToMenuText{
-  position: absolute;
-  right: 140px;
-  top: 11px;
-  width: 70px;
-  height: 70px;
+  position: relative;
+  top: 5px; 
   display: flex;
   justify-content: center;
-  align-items: left;
+  align-items: center;
   color:aliceblue;
-  font-size: 50px;
   border-radius: 50px;
 }
 
 #muteButtonText{
   position: absolute;
   right: 140px;
-  top: 115px;
+  top: 105px;
   width: 70px;
   height: 70px;
   display: flex;
   justify-content: center;
   align-items: left;
   color:aliceblue;
-  font-size: 40px;
+  
   border-radius: 50px;
+}
+
+.basicText {
+  color:rgb(255, 255, 255);
+  font-size: 45px;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  align-items: left;
+}
+
+.basic-container {
+  position: relative;
+  display: flex;
+  padding: 0px 0px; 
+  margin: auto auto;
+  width: 300px;
+  height: 50px;
+  bottom: 160px;
+  left: 150px;
+}
+
+#player2CanScore{
+  position: absolute;
+  align-items: center;
+  color:rgb(0, 0, 0);
+}
+
+.menu-buttons-container {
+  position: relative;
+  display: flex;
+  padding: 0px 0px; 
+  margin: auto auto;
+  width: 200px;
+  height: 450px;
+  bottom: 800px;
+  left: 875px;
+  /*background-color: #ffffff;*/
 }
 
 /*
@@ -252,7 +287,6 @@ https://codepen.io/MarvinVK/pen/zYMEqy
   100% {opacity: 20%;box-shadow: inset 0px 0px 10px 10px rgba(0,0,0);}
 }
 
-
 #gameTitle{
   position: absolute;
   margin-left: auto;
@@ -265,8 +299,6 @@ https://codepen.io/MarvinVK/pen/zYMEqy
   background:linear-gradient(to bottom, #eae0c2 5%, #ccc2a6 100%);
   box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
 }
-
-
 
 .showHover {
   animation-name: animate;
@@ -294,24 +326,23 @@ button.black{
   background-repeat: no-repeat;
 }
 
-  
-  .grid-container {
-    position: relative;
-    display: grid;
-    grid-template-columns: auto auto auto auto auto auto auto auto;
-    grid-template-rows: auto auto auto;
-    grid-gap: 2px;
-    background-color: #8d8779;
-    padding: 150px 50px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 200px;
-    width: 1200px;
-    height: 300px;
-    -webkit-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
-    -moz-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
-    box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
-  }
+.grid-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto;
+  grid-template-rows: auto auto auto;
+  grid-gap: 2px;
+  background-color: #8d8779;
+  padding: 150px 50px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 200px;
+  width: 1200px;
+  height: 300px;
+  -webkit-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
+  -moz-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
+  box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
+}
   
   .grid-container > div {
     background-color: rgb(153, 134, 81);
@@ -336,12 +367,11 @@ button.black{
   } 
   .item1 {
     grid-column-start: 1;
-      grid-column-end: 1;
-      grid-row-start: 1;
-      grid-row-end: 1;
-      border: 2px solid rgba(80, 80, 60, 0.8);
+    grid-column-end: 1;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    border: 2px solid rgba(80, 80, 60, 0.8);
             
-    
     } 
     .item2 {
     grid-column-start: 2;
@@ -353,85 +383,75 @@ button.black{
           
   }
   .item3 {
-  grid-column-start: 3;
+    grid-column-start: 3;
     grid-column-end: 3;
     grid-row-start: 1;
     grid-row-end: 1;
     border: 2px solid rgba(80, 80, 60, 0.8);
-    
   } 
-    .item4 {
+  .item4 {
     grid-column-start: 4;
     grid-column-end: 4;
     grid-row-start: 1;
     grid-row-end: 1;
     background-color: rgb(255,255,240);
     border: 2px solid rgba(80, 80, 60, 0.8);
-          
   }
   .item5 {
-  grid-column-start: 7;
+    grid-column-start: 7;
     grid-column-end: 7;
     grid-row-start: 1;
     grid-row-end: 1;
     border: 2px solid rgba(80, 80, 60, 0.8);
-          
   }  
-    .item6 {
+  .item6 {
     grid-column-start: 8;
     grid-column-end: 8;
     grid-row-start: 1;
     grid-row-end: 1;
     border: 2px solid rgba(80, 80, 60, 0.8);
-    
   }
   .item7 {
-  grid-column-start: 1;
+    grid-column-start: 1;
     grid-column-end: 1;
     grid-row-start: 2;
     grid-row-end: 2;
     border: 2px solid rgba(80, 80, 60, 0.8);
-    
   }  
-    .item8 {
+  .item8 {
     grid-column-start: 2;
     grid-column-end: 2;
     grid-row-start: 2;
     grid-row-end: 2;
-    border: 2px solid rgba(80, 80, 60, 0.8);
-    
+    border: 2px solid rgba(80, 80, 60, 0.8);  
     }
   .item9 {
-  grid-column-start: 3;
+    grid-column-start: 3;
     grid-column-end: 3;
     grid-row-start: 2;
     grid-row-end: 2;
     border: 2px solid rgba(80, 80, 60, 0.8);
-    
   }
-    .item10 {
+  .item10 {
     grid-column-start: 4;
     grid-column-end: 4;
     grid-row-start: 2;
     grid-row-end: 2;
     border: 2px solid rgba(80, 80, 60, 0.8);
-          
   }
   .item11 {
-  grid-column-start: 5;
+    grid-column-start: 5;
     grid-column-end: 5;
     grid-row-start: 2;
     grid-row-end: 2;
     border: 2px solid rgba(80, 80, 60, 0.8);
-    
   } 
-    .item12 {
+  .item12 {
     grid-column-start: 6;
     grid-column-end: 6;
     grid-row-start: 2;
     grid-row-end: 2;
-    border: 2px solid rgba(80, 80, 60, 0.8);
-    
+    border: 2px solid rgba(80, 80, 60, 0.8);  
   }
   .item13 {
     grid-column-start: 7;
@@ -439,26 +459,23 @@ button.black{
     grid-row-start: 2;
     grid-row-end: 2;
     background-color: rgb(255,255,240);
-    border: 2px solid rgba(80, 80, 60, 0.8);
-          
+    border: 2px solid rgba(80, 80, 60, 0.8);        
   } 
-    .item14 {
+  .item14 {
     grid-column-start: 8;
     grid-column-end: 8;
     grid-row-start: 2;
     grid-row-end: 2;
-    border: 2px solid rgba(80, 80, 60, 0.8);
-    
+    border: 2px solid rgba(80, 80, 60, 0.8);  
   }
   .item15 {
-  grid-column-start: 1;
+    grid-column-start: 1;
     grid-column-end: 1;
     grid-row-start: 3;
     grid-row-end: 3;
-    border: 2px solid rgba(80, 80, 60, 0.8);
-         
+    border: 2px solid rgba(80, 80, 60, 0.8);     
   }  
-    .item16 {
+  .item16 {
     grid-column-start: 2;
     grid-column-end: 2;
     grid-row-start: 3;
@@ -473,7 +490,7 @@ button.black{
     grid-row-end: 3;
     border: 2px solid rgba(80, 80, 60, 0.8);
   }  
-    .item18 {
+  .item18 {
     grid-column-start: 4;
     grid-column-end: 4;
     grid-row-start: 3;
@@ -488,7 +505,7 @@ button.black{
     grid-row-end: 3;
     border: 2px solid rgba(80, 80, 60, 0.8);
   }
-    .item20 {
+  .item20 {
     grid-column-start: 8;
     grid-column-end: 8;
     grid-row-start: 3;

@@ -3,12 +3,13 @@ const config = {
   errorThresh: 0.0005, 
   hiddenLayers: [32,32,32,32], 
   log: true,
-  iterations: 300000,
+  iterations: 100000,
 };
 
 const net = new brain.NeuralNetworkGPU();
 
-fetch('./neural.json')
+difficulty = localStorage.getItem('difficulty');
+fetch(difficulty)
 .then(response => response.json())
 .then(data => {
   net.fromJSON(data);
@@ -375,4 +376,4 @@ function run(input) {
 // a.download = fileName;
 // a.click();
 // }
-// download(jsonData, 'neural.json', 'application/json');
+// download(jsonData, 'newNeural2.json', 'application/json');

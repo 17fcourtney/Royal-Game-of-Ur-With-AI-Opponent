@@ -114,28 +114,28 @@ function canRemoveEnemy(position, team) {
     if (ROLL == 0) {
         return retVal;
     }
-    
-        let space = getSpace(position, team);
-        //debug info *start
-        if (space.occupied == true && space.rosette == false) {
-            let removalPiece = space.occupiedByPiece; // enemy piece that is on space and attempting to be removed.
-            if (removalPiece.team != 1) {
-                console.log('possible removal piece ID, Location, Team:');
-                console.log('               '+removalPiece.id+' - '+removalPiece.location+' - '+removalPiece.team);
-            }
-        }
-        //debug info *end
 
-        if (position <= 3 || position >= 12 || position == 7) {
-            return retVal;
-        } else {
-            if (space.rosette == true && position == 7) {
-                retVal = false;
-            }
-        } if (space.occupied == true && space.occupiedByPiece.team != 1 && space.team == 3) {
-            retVal = true;
-            
-        } 
+    let space = getSpace(position, team);
+    //debug info *start
+    if (space.occupied == true && space.rosette == false) {
+        let removalPiece = space.occupiedByPiece; // enemy piece that is on space and attempting to be removed.
+        if (removalPiece.team != 1) {
+            console.log('possible removal piece ID, Location, Team:');
+            console.log('               '+removalPiece.id+' - '+removalPiece.location+' - '+removalPiece.team);
+        }
+    }
+    //debug info *end
+
+    if (position <= 3 || position >= 12 || position == 7) {
+        return retVal;
+    } else {
+        if (space.rosette == true && position == 7) {
+            retVal = false;
+        }
+    } if (space.occupied == true && space.occupiedByPiece.team != 1 && space.team == 3) {
+        retVal = true;
+        
+    } 
     
     return retVal;
 }
@@ -395,6 +395,7 @@ function gameRun(team, n){
             else
                 console.log("cant move here");
         }
+        
     });
     updateOccupied(board,totalPieces);
 }
@@ -547,8 +548,11 @@ function movePiece(team,piece,location) {
         oldSpace.removePiece();
     }
     updateOccupied(board,totalPieces);
+    if (turn == 2) {
+        p2.addMove();
+        console.log(p2.moves);
+    }
 }
-
 
 function displayButton(){
     for(let x=0; x<5; x++){       
@@ -629,7 +633,6 @@ var hasRolled=true;
  * uses global ROLL
  */
 function animateDice(){
-    let dicePics = [1,2,3,4,5,6];
     let diceShown = [];
     let w,x,y,z;
     switch(ROLL){
@@ -704,9 +707,6 @@ function animateDice(){
     });
 }
 
-function sleep (time) {
-    return new Promise((resolve) => setTimeout(resolve, time));
-}
 /**
  * plays dice audio without throwing error when user hasn't interacted with document
  */
@@ -722,15 +722,21 @@ function playDiceAudio() {
 
 $('.speaker').click(function(e) {
     e.preventDefault();
-    if ($(this).hasClass('mute')) {
+    if (!checkACookieExists()) {
+        createCookies();
+    }
+    if ($(this).hasClass('mute')) { //already muted, so we switch back to unmute
         dice_roll.muted = false;
         oof.muted = false;
-    } else {
+        setMuteCookieStatus(false);
+    } else { //not muted, switch to mute mode
         dice_roll.muted = true;
         oof.muted = true;
+        setMuteCookieStatus(true);
     }
     $(this).toggleClass('mute');
-  });
+});
+
 /**
  * sets global ROLL variable
  * @returns randomly chosen number between 0 and 4 to represent the random dice roll
@@ -809,7 +815,9 @@ function playerScored(team,piece) {
 
 //START
 //** onclick buttons start gameRun() */
+checkACookieExists();
 
+var p2 = new Player(2);
 var turn = 2;
 var oof = new Audio('oof.mp3');
 var dice_roll = new Audio('dice_roll.mp3');
@@ -821,24 +829,20 @@ board = setInitialState();
 var totalPieces = getButtons();
 var p1Pieces = totalPieces.splice(0,5);
 var p2Pieces = totalPieces;
-//console.log(p1Pieces);
-//console.log(p2Pieces);
 totalPieces = p1Pieces.concat(p2Pieces);
-//console.log(totalPieces);
 board = updateOccupied(board,totalPieces);
 console.log(board);
 
 
 // let out = net.train(trainData,config);
 // var jsonData = net.toJSON();
-// // jsonData = JSON.stringify(jsonData);
+// jsonData = JSON.stringify(jsonData);
 
 // function download(content, fileName, contentType) {
-
-// var a = document.createElement("a");
-// var file = new Blob([content], {type: contentType});
+// let a = document.createElement("a");
+// let file = new Blob([content], {type: contentType});
 // a.href = URL.createObjectURL(file);
 // a.download = fileName;
 // a.click();
 // }
-// download(jsonData, 'neural.json', 'application/json');
+// download(jsonData, 'newNeural2.json', 'application/json');
