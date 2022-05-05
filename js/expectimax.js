@@ -15,6 +15,7 @@ class Space {
         this.occupied = true;
         this.occupiedByPiece = piece;
         piece.location = this.id;
+        piece.onBoard = true;
     }
     removePiece(){
         this.occupied = false;
@@ -93,10 +94,10 @@ function getButtons() {
     for (let i = 0; i < ids.length; i++) {
         let temp = ids[i];
         if (temp.classList.contains("black")) {
-            temp = new Piece(-1,2,i, false);       //piece(location, team, id)
+            temp = new Piece(-1,2,i, false);       //piece(location, team, id, onBoard)
             arr.push(temp);
         } else if (temp.classList.contains("white")) {
-            temp = new Piece(-1,1,i, false);       //piece(location, team, id)
+            temp = new Piece(-1,1,i, false);       //piece(location, team, id, onBoard)
             arr.push(temp);
         }
     }
@@ -134,7 +135,6 @@ function canRemoveEnemy(position, team) {
         }
     } if (space.occupied == true && space.occupiedByPiece.team != 1 && space.team == 3) {
         retVal = true;
-        
     } 
     
     return retVal;
@@ -368,6 +368,7 @@ function gameRun(team, n){
         else {
             turn = 2;
             team = 2;
+            console.log(Human);
             await sleep(333);
             let location = p2Pieces[n].location + ROLL;
             team = getTeamByPosition(location,2);
@@ -469,19 +470,7 @@ function checkHoverLocation(hoverLocation, team){
     }
    return retVal;
 }
-/**
- * not currently used; 
- * @param {*} player 
- * @returns number of pieces that are on the board for the player
- */
-function playerPiecesOnBoard(player){
-    let sum = 0;
-    for(x=0;x<player.length; x++){
-        if(player[x].onBoard)
-            sum++;
-    }
-    return sum;
-}
+
 /**
  * This function only moves the HTML element to its new place on the board.
  * @param {*} piece The piece object to be moved off board
@@ -507,6 +496,7 @@ function moveOffBoard(piece){
         $("#p"+piece.id).css(yLevel, "25px");
         $("#p"+piece.id).detach().appendTo(".grid-container");
         piece.location = -1;
+        piece.onBoard = false;
     });
     oof.play();
 }
@@ -520,6 +510,10 @@ function movePiece(team,piece,location) {
     let oldSpace, test;   
     let newSpace = getSpace(location, team);
     if (location != -1 && location != 14) {
+        if (turn == 2) {
+            Human.addMove();
+            Human.recordMove(piece, ROLL, newSpace);
+        }
         //moves the button on the gui
         $(document).ready(function() {
             $("#p"+piece.id).appendTo("#"+location + ".team" + team);
@@ -536,6 +530,8 @@ function movePiece(team,piece,location) {
         }
         //updates new space and changes location of piece
         newSpace.moveToSpace(piece);
+        piece.onBoard = true;
+        
     } else if (location == -1) {
         $(document).ready(function() {
             $("#p"+piece.id).appendTo(document.getElementsByTagName("div")[0]); //move back to starting position
@@ -548,10 +544,7 @@ function movePiece(team,piece,location) {
         oldSpace.removePiece();
     }
     updateOccupied(board,totalPieces);
-    if (turn == 2) {
-        p2.addMove();
-        console.log(p2.moves);
-    }
+    
 }
 
 function displayButton(){
@@ -600,12 +593,8 @@ function getMoves(roll) {
         let team;
         if (newSpace > 14) 
             continue;
+        team = getTeamByPosition(newSpace, 1);
         
-        if (newSpace > 3 && newSpace < 12) {
-            team = 3;
-        } else {
-            team = 1;
-        }
         let temp = getSpace(newSpace,team);
         let canRemove = canRemoveEnemy(newSpace,team); 
         if (temp.occupied == false || (p1Pieces[x].location == -1 && temp.occupied == false) || (newSpace > 3 && newSpace < 12 && canRemove == true)) {
@@ -671,34 +660,34 @@ function animateDice(){
         // Usage!
         sleep(100).then(() => {
             // Do something after the sleep!
-            $("#die" + 0).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
-            $("#die" + 1).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-            $("#die" + 2).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-            $("#die" + 3).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+            $("#die" + 0).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+            $("#die" + 1).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+            $("#die" + 2).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+            $("#die" + 3).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
             sleep(100).then(() => {
                 // Do something after the sleep!
-                $("#die" + 0).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
-                $("#die" + 1).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-                $("#die" + 2).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-                $("#die" + 3).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+                $("#die" + 0).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+                $("#die" + 1).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+                $("#die" + 2).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+                $("#die" + 3).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
                 sleep(100).then(() => {
                     // Do something after the sleep!
-                    $("#die" + 0).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
-                    $("#die" + 1).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-                    $("#die" + 2).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-                    $("#die" + 3).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+                    $("#die" + 0).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+                    $("#die" + 1).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+                    $("#die" + 2).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+                    $("#die" + 3).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
                     sleep(100).then(() => {
                         // Do something after the sleep!
-                        $("#die" + 0).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
-                        $("#die" + 1).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-                        $("#die" + 2).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
-                        $("#die" + 3).delay(100).css("background-image", "url('die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+                        $("#die" + 0).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
+                        $("#die" + 1).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+                        $("#die" + 2).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");  
+                        $("#die" + 3).delay(100).css("background-image", "url('/images/die" + (Math.floor(Math.random() * 6) + 1) + ".png')");
                         let temp = [w+1,x+1,y+1,z+1];
                         for(n=0; n<4; n++){
                             let indexToBeRemoved = Math.floor(Math.random() * (4-n));
                             diceShown[n]=temp[indexToBeRemoved];
                             temp.splice(indexToBeRemoved, 1);
-                            $("#die" + n).css("background-image", "url('die" + diceShown[n] + ".png')");  
+                            $("#die" + n).css("background-image", "url('/images/die" + diceShown[n] + ".png')");  
                         }
                     });
                 });
@@ -789,6 +778,7 @@ function playerScored(team,piece) {
         p1Score += 1;
     } else {
         p2Score += 1;
+        Human.addScore();
     }
     $(document).ready(function() {
         let player;
@@ -810,17 +800,16 @@ function playerScored(team,piece) {
         $("#p"+piece.id).css(yLevel, "25px");
         $("#p"+piece.id).detach().appendTo(".grid-container");
         piece.location = 14;
+        piece.onBoard = false;
     });
 }
 
 //START
 //** onclick buttons start gameRun() */
 checkACookieExists();
-
-var p2 = new Player(2);
 var turn = 2;
-var oof = new Audio('oof.mp3');
-var dice_roll = new Audio('dice_roll.mp3');
+var oof = new Audio('/audio/oof.mp3');
+var dice_roll = new Audio('/audio/dice_roll.mp3');
 var ROLL = roll();
 var board = [];
 var p1Score = 0; p2Score = 0;
@@ -829,9 +818,12 @@ board = setInitialState();
 var totalPieces = getButtons();
 var p1Pieces = totalPieces.splice(0,5);
 var p2Pieces = totalPieces;
+var Human = new Player(2,p2Pieces);
+
 totalPieces = p1Pieces.concat(p2Pieces);
 board = updateOccupied(board,totalPieces);
 console.log(board);
+//console.log(Human);
 
 
 // let out = net.train(trainData,config);

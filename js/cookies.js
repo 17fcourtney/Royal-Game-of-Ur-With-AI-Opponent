@@ -3,11 +3,11 @@ function checkACookieExists() {
         if (document.cookie.split(';').some((item) => item.includes('mute=true'))) {
             if (!$('.speaker').hasClass('mute')) {
                 $('.speaker').addClass('mute');
-            }  
+            }
             return true;
         } else if (document.cookie.split(';').some((item) => item.includes('mute=false')))  {
                 if ($('.speaker').hasClass('mute'))
-                $('.speaker').removeClass('mute');        
+                $('.speaker').removeClass('mute');      
             return false;
         }
     });
@@ -29,14 +29,14 @@ function setMuteCookieStatus(status) {
     }
 }
 
-var difficulty = './neural.json';
+var difficulty = 'nets/neural.json';
 $(document).ready(function() {
         $(document).on("click",".difficulty_buttons", function() {
             if ($(this).attr('id') == 'beginnerButton') {
               console.log('beginner');
-              localStorage.setItem('difficulty','./lessAggressiveAI.json');
+              localStorage.setItem('difficulty','nets/lessAggressiveAI.json');
             } else {
-              localStorage.setItem('difficulty','./neural.json');
+              localStorage.setItem('difficulty','nets/neural.json');
             }
-          });    
+        });    
 })
