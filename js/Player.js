@@ -3,19 +3,20 @@ class Player {
         this.team = team;
         this.pieces = pieces;
     }
-    moves = 0; score = 0;
+    moves = 0; score = 0; opponentsRemoved = 0;
     recordedMoves = [];
     difficulty = this.findDifficulty();
     findDifficulty() {
-        if (localStorage.getItem('difficulty') != null) {
-            if (localStorage.getItem('difficulty') == 'nets/lessAggressiveAI.json') {
+        let currVal = localValueGetter('difficulty');
+        if (currVal != null) {
+            if (currVal == 'nets/lessAggressiveAI.json') {
                 return "Beginner";
             } else {
                 return "Normal";
             }
         }
     }
-
+    
     addMove() {
         this.moves += 1;
     }
@@ -24,7 +25,7 @@ class Player {
     }
     getPiecesOnBoard() {
         let retVal = [];
-        for(let x=0; x<this.pieces.length; x++){
+        for(let x=0; x<this.pieces.length; x++) {
             if(this.pieces[x].onBoard == true)
                 retVal.push(this.pieces[x]);
             }
@@ -47,25 +48,39 @@ class Player {
         } 
         return retVal;
     }
-count = 0;
-    recordMove(piece, roll, spaceMovedTo) {
-        this.count += 1;
-        let input;
+
+    recordMove(piece, roll, spaceMovedToLocation) {
+        let rosette; let removeOpponent;
+        let team = getTeamByPosition(spaceMovedToLocation,2);
+        if (spaceMovedToLocation == 14) {
+            rosette = false;
+            removeOpponent = false;
+        } else {
+            let spaceMovedTo = getSpace(spaceMovedToLocation,team);
+            rosette = spaceMovedTo.rosette;
+            removeOpponent = this.removeEnemy(spaceMovedTo.id);
+        }
+        if (removeOpponent === true) {
+            this.opponentsRemoved += 1;
+        }
+        let input = {
+            //piece: piece,
+            position: piece.location,
+            roll: roll,
+            rosette: rosette,
+            removeEnemyPiece: removeOpponent
+            }; 
         this.recordedMoves.push(
-            { input: {
-                //piece: piece,
-                position: piece.location,
-                roll: roll,
-                rosette: spaceMovedTo.rosette,
-                removeEnemyPiece: this.removeEnemy(spaceMovedTo.id)
+            { input: input,
+                output: {
+                    result: run(input)//evaluateBoard(piece.location,roll,2)
                 }
             }
-        ); 
-        console.log(this.recordedMoves);
-        if (this.count == 20) {
-            downloadObjectAsJson(this.recordedMoves,'test');
-        } 
-        
+        );
+        console.log(this.recordedMoves); 
+        if (this.recordedMoves.length === 25) {
+            downloadObjectAsJson(this.recordedMoves,this.moves+'MoveLog');
+            this.recordedMoves = []; //reset array of recorded moves to get new data after 25 moves
+        }    
     }
-
 }

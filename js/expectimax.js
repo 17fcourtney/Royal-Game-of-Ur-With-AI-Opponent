@@ -36,7 +36,7 @@ class Piece {
  * Used to update board array with new state of occupied spaces
  * @param {*} board global board
  * @param {*} pieces all pieces (totalPieces) to update entire board
- * @returns updated game state with occupied and occupiedByPiece properties updated
+ * @returns updated game state (board) with occupied and occupiedByPiece properties updated
  */
 function updateOccupied(board, pieces) {
     let retVal = board;
@@ -115,7 +115,6 @@ function canRemoveEnemy(position, team) {
     if (ROLL == 0) {
         return retVal;
     }
-
     let space = getSpace(position, team);
     //debug info *start
     if (space.occupied == true && space.rosette == false) {
@@ -126,7 +125,6 @@ function canRemoveEnemy(position, team) {
         }
     }
     //debug info *end
-
     if (position <= 3 || position >= 12 || position == 7) {
         return retVal;
     } else {
@@ -136,13 +134,12 @@ function canRemoveEnemy(position, team) {
     } if (space.occupied == true && space.occupiedByPiece.team != 1 && space.team == 3) {
         retVal = true;
     } 
-    
     return retVal;
 }
 
 /**
- * Not currently used.
- * 
+ * Not currently implemented.
+ * Evaluation to give a move a score based on the current state of the piece
  * @param {*} position piece location 
  * @param {*} roll ROLL
  * @param {*} team AI team (1)
@@ -152,35 +149,49 @@ function evaluateBoard(position,roll,team) {
     let score = 0;
     
     let newSpace = roll + position;
+    team = getTeamByPosition(newSpace,team);
     let checkSpace = getSpace(newSpace,team);
-    if (roll == 0 && checkSpace.rosette == false) {
-        return 0;
-    } else if (roll == 0 && checkSpace.rosette == true) {
+    if (roll == 0) {
+        if (checkSpace.rosette == false) {
+            return 0;
+        } else if (checkSpace.rosette == true) {
+            score += 50;
+        }
+        return score;
+    }
+    if (Human.removeEnemy(newSpace) == true) {
         score += 40;
     }
-    if (position == -1 && checkSpace.rosette == true && checkSpace.occupied == false && roll > 0) {
-        score += 75;
-    } else if (position >= 0 && checkSpace.rosette == true) {
-        score += 90;
-    } else if (position == - 1 && checkSpace.occupied == false) {
-        score += 80;
+    if (roll != 0 && newSpace == 14) { //piece can score
+        return 1;
+    } 
+    if (roll > 0) {
+        if (checkSpace.rosette == true) {
+            score += 40;
+        } 
+        if (position <= 2) {
+            if (checkSpace.id > 3) {
+                score += 30;
+            } else {
+                score += 20;
+            }
+        } else if (position >= 3 && checkSpace.id <= 7) { 
+            score += 35;
+        } else if (position >= 7) {
+                if (checkSpace.id >= 12) {
+                    score += 55;
+                } else {
+                    score += 40;
+                }
+            }
     }
-    if (position > 3 && position < 12 && roll > 2) {
-        score += 50;
-    } else {
-        score += 75;
-    }  
-    if (canRemoveEnemy(newSpace, team) == true) {
-        score += 25;
-    }
+    
     if (score > 100) {
         score = 100;
     }
     return score/100.0;
 }
 
-//** takes in a spot (HTML div) and current state and returns the boardSpace
-//** used for finding what boardSpace a piece is on */
 /**
  * Used to get the board space (object) using location and team
  * @param {*} location  
@@ -243,7 +254,7 @@ function disablesPieces(isRoll = false){
     });
 }
 /**
- * 
+ * gets the team by board space
  * @param {*} position the position of the board space i.e. piece position + roll 
  * @param {*} currentTeam the current team; 1 = AI -- 2 = player
  * @returns 1/2 if space belongs to a team and 3 if space is in the danger zone
@@ -255,7 +266,6 @@ function getTeamByPosition(position, currentTeam) {
     return retVal;
 }
 
-
 /**
  * This function runs each possible AI move through the Neural Network to get its predicted value.
  * @param {*} team Can always be called with 1
@@ -264,44 +274,34 @@ function getTeamByPosition(position, currentTeam) {
 function aiPlay(team) {
     let max = -1, maxMove, temp=null;
     let t = -1;
-    if (turn == 1) { 
+    if (turn === 1) { 
         let m = getMoves(ROLL);
-        if (m == null || m == undefined) {
+        if (m == null || m == undefined || m == [] || m.length == 0) {
+            turn = 2;
+            roll();
             return;
         }
-        //console.log(m);
+        console.log(m);
         for (let i = 0; i < m.length; i++) {
             let move = {
                 position:m[i].input.position, roll:m[i].input.roll, rosette:m[i].input.rosette, removeEnemyPiece:m[i].input.removeEnemyPiece
             }
             //console.log(move); 
             let thisRun = run(move); //runs this move against the neural net, gets back score / 1 
-           // console.log(thisRun);
-            
+            //console.log(thisRun);
             if (thisRun.result > max) {
                 t = m[i].input.pieceID;
                 max = thisRun.result;
                 maxMove = move;
                 temp = p1Pieces[t];
             }
-        }
-    
+        }    
     maxMove.piece = temp;
     maxMove.team = getTeamByPosition(maxMove.position+maxMove.roll,1);
     
     return maxMove;
     }
 }
-/**
- * Used to pause execution and wait until the provided amount of ms passes.
- * @param {*} ms The amount of time in ms to pause for.
- * @returns execution awaits for ms
- */
-function sleep(ms) {
-    return new Promise(
-      resolve => setTimeout(resolve, ms)
-    );
-  }
 
  /**
  * adjusts the turn boxes to use a different CSS class when it is that players turn
@@ -310,20 +310,17 @@ function changeTurn(){
     $(document).ready(function() {
         if(turn == 1){
             $(".turnDisplay1").attr("id", "player1Out");
-            //$(".turnDisplay1").html("");
             $(".turnDisplay2").attr("id", "player2Out");
-            //$(".turnDisplay2").html("Player 2, Roll");
         }
         else {
             $(".turnDisplay1").attr("id", "player1In");
             $(".turnDisplay2").attr("id", "player2Out");
-            //$(".turnDisplay2").html("Player 2, Roll");
         }
     });
 }
 
 /**
- * 
+ * Main game function; on player side, runs when a piece is clicked. AI plays when it is it's turn
  * @param {*} team not necessarily needed, but team value
  * @param {*} n current piece that is being worked with
  */
@@ -368,8 +365,7 @@ function gameRun(team, n){
         else {
             turn = 2;
             team = 2;
-            console.log(Human);
-            await sleep(333);
+            await sleep(200);
             let location = p2Pieces[n].location + ROLL;
             team = getTeamByPosition(location,2);
             
@@ -396,8 +392,8 @@ function gameRun(team, n){
             else
                 console.log("cant move here");
         }
-        
     });
+    checkIfWon();
     updateOccupied(board,totalPieces);
 }
 
@@ -424,7 +420,7 @@ function mouseHover(n, bool){
         
         if(bool){
             if(checkHoverLocation(hoverLocation, teamClass)) {
-                if (hoverLocation === 14 && turn == 2) { //if the human player is hovering a piece that will score, show them a message
+                if (hoverLocation === 14 && turn === 2) { //if the human player is hovering a piece that will score, show them a message
                     $("#player2CanScore").html("Scoring Move!");
                 }
                 $("#" + hoverLocation + ".team" + teamClass).css("background-color", "green");
@@ -509,11 +505,12 @@ function moveOffBoard(piece){
 function movePiece(team,piece,location) {
     let oldSpace, test;   
     let newSpace = getSpace(location, team);
+    if (turn == 2) {
+        Human.addMove();
+        Human.recordMove(piece, ROLL, location);
+    }
     if (location != -1 && location != 14) {
-        if (turn == 2) {
-            Human.addMove();
-            Human.recordMove(piece, ROLL, newSpace);
-        }
+        
         //moves the button on the gui
         $(document).ready(function() {
             $("#p"+piece.id).appendTo("#"+location + ".team" + team);
@@ -524,7 +521,6 @@ function movePiece(team,piece,location) {
         //if pieces current location is start position, then let team be passed as their respective team
         if(piece.location != -1){
             test = getTeamByPosition(piece.location,piece.team);
-            
             oldSpace = getSpace(piece.location, test); 
             oldSpace.removePiece();
         }
@@ -605,16 +601,14 @@ function getMoves(roll) {
                     roll: roll,
                     rosette: temp.rosette,
                     removeEnemyPiece: canRemove
-                }
+                }   
             },
             );
         }
     }
     return retVal;
 }
-
 displayButton();
-
 var hasRolled=true;
 
 /**
@@ -696,61 +690,45 @@ function animateDice(){
     });
 }
 
-/**
- * plays dice audio without throwing error when user hasn't interacted with document
- */
-function playDiceAudio() {
-    let playPromise = dice_roll.play();
-    if (playPromise !== undefined) {
-        playPromise.then(_ => {
-        })
-        .catch(error => {
-        });
-    }
-}
-
-$('.speaker').click(function(e) {
-    e.preventDefault();
-    if (!checkACookieExists()) {
-        createCookies();
-    }
-    if ($(this).hasClass('mute')) { //already muted, so we switch back to unmute
-        dice_roll.muted = false;
-        oof.muted = false;
-        setMuteCookieStatus(false);
-    } else { //not muted, switch to mute mode
-        dice_roll.muted = true;
-        oof.muted = true;
-        setMuteCookieStatus(true);
-    }
-    $(this).toggleClass('mute');
-});
+// /**
+//  * plays dice audio without throwing error when user hasn't interacted with document
+//  */
+// function playDiceAudio() {
+//     if (dice_roll.muted != true) {
+//         let playPromise = dice_roll.play();
+//         if (playPromise !== undefined) {
+//             playPromise.then(_ => {
+//         })
+//         .catch(error => {});
+//         }
+//     }
+// }
 
 /**
  * sets global ROLL variable
  * @returns randomly chosen number between 0 and 4 to represent the random dice roll
  */
 function roll(){
-    sum = 0
-    dieList = [0,0,1,1]
+    sum = 0;
+    dieList = [0,0,1,1];
     for(let x = 0; x < 4; x++){
         die = dieList[Math.floor(Math.random()*4)]      //picks a random number between 0-3 to get randomized dice
         sum += die
     }
     ROLL = sum;
     animateDice();
-    hasRolled=true;
+    hasRolled = true;
     console.log("roll: " + ROLL);
     $(document).ready(function() {
-        if(turn==1) {
+        if(turn === 1) {
             $(".turnDisplay1").html("Player " + turn + " rolled a: " + ROLL);
         } else {
             $(".turnDisplay2").html("Player " + turn + " rolled a: " + ROLL);
         }
     });
     playDiceAudio();
-
-    if (turn == 2 && ROLL == 0) {
+    
+    if (turn === 2 && ROLL === 0) {
         $(".turnDisplay2").html("Player " + turn + " rolled a: " + ROLL);
         console.log(turn);
         turn = 1;
@@ -781,16 +759,16 @@ function playerScored(team,piece) {
         Human.addScore();
     }
     $(document).ready(function() {
-        let player;
+        //let player;
         let yLevel;     //this will change the "top" or "bottom" of the piece depending on the team
         let left;
-        if(piece.team==1){
-            player= p1Pieces; 
+        if (piece.team==1){
+            //player= p1Pieces; 
             yLevel="top";
             left= (piece.id+1)*50;
         }
-        else{
-            player= p2Pieces;
+        else {
+            //player= p2Pieces;
             yLevel="bottom";
             left = (piece.id-4)*50;
         }
@@ -803,14 +781,35 @@ function playerScored(team,piece) {
         piece.onBoard = false;
     });
 }
+/**
+ * @returns false if no one has won yet, true if a player has scored 5 pieces.
+ */
+function checkIfWon() { 
+    let gameOver = false;
+    if (p1Score === 5) {
+        gameOver = true;
+        winner = AI;
+    } else if (p2Score === 5) {
+        gameOver = true;
+        winner = Human;
+    }
+    if (gameOver) {
+        player = JSON.stringify(Human);
+        localValueSaver('human', player);
+        transitionToPage('gameOver.html');
+    }
+    return gameOver;
+}
 
+function startGame() {
+    ROLL = roll();
+}
 //START
 //** onclick buttons start gameRun() */
-checkACookieExists();
+
 var turn = 2;
-var oof = new Audio('/audio/oof.mp3');
-var dice_roll = new Audio('/audio/dice_roll.mp3');
-var ROLL = roll();
+
+var ROLL; //= roll();
 var board = [];
 var p1Score = 0; p2Score = 0;
 board = setInitialState();
@@ -818,13 +817,18 @@ board = setInitialState();
 var totalPieces = getButtons();
 var p1Pieces = totalPieces.splice(0,5);
 var p2Pieces = totalPieces;
-var Human = new Player(2,p2Pieces);
+var AI = new Player(1, p1Pieces);
+var Human = new Player(2, p2Pieces);
+var winner = undefined;
 
 totalPieces = p1Pieces.concat(p2Pieces);
 board = updateOccupied(board,totalPieces);
 console.log(board);
 //console.log(Human);
 
+window.requestAnimationFrame(function() {
+    startGame();
+})
 
 // let out = net.train(trainData,config);
 // var jsonData = net.toJSON();

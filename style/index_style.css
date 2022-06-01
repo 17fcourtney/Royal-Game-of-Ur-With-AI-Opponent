@@ -3,6 +3,8 @@ body{
     border-image-repeat: repeat;
     width: auto;
     font-family: MedievalSharp;
+    opacity: 0;
+    transition: opacity .5s;
 }
 
 #backToMenu{
@@ -40,6 +42,28 @@ body{
 }
 #title h1{
     font-size: 45px;
+}
+#playAgainWrapper {
+    position: relative;
+    width: 700px;
+    /* background-color: #ffffff; */
+    margin: auto auto;
+}
+#playAgain {
+    position: relative;
+    width: 700px;
+    padding: 25px 0px;
+    margin: auto auto;
+    margin-top: 50px;
+    text-align: center;
+    font-size: 4em;
+    background-color: #8d8779;
+    border-radius: 10px;
+    font-family: MedievalSharp;
+    -webkit-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
+    -moz-box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7);
+    box-shadow: 0px 0px 10px 3px rgba(0,0,0,0.7); 
+    border: 1px solid black;
 }
 
 a, a:visited{
@@ -109,4 +133,11 @@ a, a:visited{
     position: relative;
     margin-top: auto;
     left: 200px;
+}
+#winner {
+    text-align: center;
+    font-size: 48px;
+}
+#stats {
+    font-size: 36px;
 }

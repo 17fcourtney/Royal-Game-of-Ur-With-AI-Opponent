@@ -8,11 +8,12 @@ const config = {
 
 const net = new brain.NeuralNetworkGPU();
 
-difficulty = localStorage.getItem('difficulty');
+var difficulty;
 if (localStorage.getItem('difficulty') != null) {
   difficulty = localStorage.getItem('difficulty');
 } else {
   difficulty = 'nets/neural.json';
+  localValueSaver('difficulty', difficulty);
 }
 
 fetch(difficulty)
